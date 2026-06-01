@@ -82,7 +82,7 @@ IMPORTANT: custom_summary and the summary section content must be written in fir
       },
       {
         "type": "skills",
-        "visible": true,
+        "visible": false,
         "items": [
           { "content_id": "<uuid>", "order": 1 }
         ]
