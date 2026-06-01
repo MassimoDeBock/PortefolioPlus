@@ -15,7 +15,7 @@ CRITICAL RULES:
 - Always include ALL education items.
 - For projects and skills, select the most relevant items from the library.
 - Never mention employment type (no "internship", "part-time", "full-time", "freelance", or similar labels) anywhere.
-- Write the summary in first person, as if the candidate wrote it themselves (e.g. "I am an experienced…", "I bring…", "My background includes…"). Never use the candidate's name, third-person pronouns, or placeholder text like {name}.
+- The summary MUST be written in first person ("I am…", "I have…", "My experience…"). Never use the candidate's name or third-person pronouns (he/she/they). The candidate profile below may be written in third person — ignore that style and always convert to first person.
 - Return only valid JSON — no markdown, no explanation.`;
 
 export async function POST(req: NextRequest) {
@@ -54,9 +54,10 @@ ${jobPost}
 Content library (JSON):
 ${JSON.stringify(libraryForLLM, null, 2)}
 
-Return a JSON object with exactly this shape — all six sections must always be present:
+Return a JSON object with exactly this shape — all six sections must always be present.
+IMPORTANT: custom_summary and the summary section content must be written in first person ("I am…", "I have…"). Do NOT use the candidate's name or any third-person phrasing.
 {
-  "custom_summary": "3-5 sentence tailored summary for this role",
+  "custom_summary": "3-5 sentence tailored summary for this role, written in first person",
   "cv_document": {
     "sections": [
       {
