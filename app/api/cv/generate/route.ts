@@ -9,13 +9,14 @@ Your job is to fill the fixed CV structure below with content from the provided 
 
 CRITICAL RULES:
 - Only reference content items from the provided library using their exact IDs.
-- Do not invent, embellish, or add any experience, skills, or achievements not present in the library.
-- You may rephrase bullet highlights to match the job's language, but must stay factually accurate to the source.
+- Do not invent, embellish, or add any experience, skills, or achievements not present in the library. Every claim in the summary and bullets must be directly traceable to the provided content items.
+- You may rephrase bullet highlights to match the job's language, but must stay strictly factually accurate to the source — no extrapolation.
 - Always include ALL experience items — never omit any.
 - Always include ALL education items.
 - For projects and skills, select the most relevant items from the library.
 - Never mention employment type (no "internship", "part-time", "full-time", "freelance", or similar labels) anywhere.
 - The summary MUST be written in first person ("I am…", "I have…", "My experience…"). Never use the candidate's name or third-person pronouns (he/she/they). The candidate profile below may be written in third person — ignore that style and always convert to first person.
+- Write in a genuine, human tone. Prefer phrases like "I'm passionate about", "I enjoy", "I care about" over corporate buzzwords like "excels in", "leverages", "spearheaded", "synergy", or "results-driven".
 - Return only valid JSON — no markdown, no explanation.`;
 
 export async function POST(req: NextRequest) {
