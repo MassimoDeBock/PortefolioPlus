@@ -64,7 +64,16 @@ export default async function CompanyPage({ params }: { params: { hash: string }
 
   const headerSection = sections.find(s => s.type === 'header') as Extract<Section, { type: 'header' }> | undefined;
   const headerItem = headerSection ? byId(library, headerSection.content_id) : null;
-  const headerMeta = (headerItem?.metadata ?? {}) as Record<string, unknown>;
+  const rawHeaderMeta = (headerItem?.metadata ?? {}) as Record<string, unknown>;
+  const headerMeta = {
+    full_name: rawHeaderMeta.full_name as string | undefined,
+    email:     rawHeaderMeta.email     as string | undefined,
+    phone:     rawHeaderMeta.phone     as string | undefined,
+    location:  rawHeaderMeta.location  as string | undefined,
+    linkedin:  rawHeaderMeta.linkedin  as string | undefined,
+    github:    rawHeaderMeta.github    as string | undefined,
+    website:   rawHeaderMeta.website   as string | undefined,
+  };
 
   return (
     <main className="min-h-screen" style={{ color: 'var(--text-primary)' }}>
@@ -79,7 +88,7 @@ export default async function CompanyPage({ params }: { params: { hash: string }
             className="text-center text-4xl font-bold tracking-tight"
             style={{ color: 'var(--text-primary)', textShadow: 'var(--name-shadow)' }}
           >
-            {String(headerMeta.full_name ?? cv.roleTitle)}
+            {headerMeta.full_name ?? cv.roleTitle}
           </h1>
 
           {/* Role + tailored badge — centered inline */}
@@ -101,7 +110,7 @@ export default async function CompanyPage({ params }: { params: { hash: string }
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/>
                   </svg>
-                  <span>{String(headerMeta.email)}</span>
+                  <span>{headerMeta.email}</span>
                 </div>
               )}
               {headerMeta.phone && (
@@ -109,7 +118,7 @@ export default async function CompanyPage({ params }: { params: { hash: string }
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1l-2.3 2.2z"/>
                   </svg>
-                  <span>{String(headerMeta.phone)}</span>
+                  <span>{headerMeta.phone}</span>
                 </div>
               )}
               {headerMeta.location && (
@@ -117,7 +126,7 @@ export default async function CompanyPage({ params }: { params: { hash: string }
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5"/>
                   </svg>
-                  <span>{String(headerMeta.location)}</span>
+                  <span>{headerMeta.location}</span>
                 </div>
               )}
               {headerMeta.linkedin && (
@@ -125,8 +134,8 @@ export default async function CompanyPage({ params }: { params: { hash: string }
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <rect x="2" y="2" width="20" height="20" rx="3"/><line x1="8" y1="11" x2="8" y2="16"/><line x1="8" y1="8" x2="8" y2="8.5"/><path d="M12 16v-5M16 16v-3a2 2 0 0 0-4 0"/>
                   </svg>
-                  <a href={String(headerMeta.linkedin)} target="_blank" rel="noopener noreferrer" className="cyber-link">
-                    {String(headerMeta.linkedin).replace(/^https?:\/\//, '')}
+                  <a href={headerMeta.linkedin} target="_blank" rel="noopener noreferrer" className="cyber-link">
+                    {headerMeta.linkedin.replace(/^https?:\/\//, '')}
                   </a>
                 </div>
               )}
@@ -135,8 +144,8 @@ export default async function CompanyPage({ params }: { params: { hash: string }
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
                   </svg>
-                  <a href={String(headerMeta.github)} target="_blank" rel="noopener noreferrer" className="cyber-link">
-                    {String(headerMeta.github).replace(/^https?:\/\//, '')}
+                  <a href={headerMeta.github} target="_blank" rel="noopener noreferrer" className="cyber-link">
+                    {headerMeta.github.replace(/^https?:\/\//, '')}
                   </a>
                 </div>
               )}
@@ -145,7 +154,7 @@ export default async function CompanyPage({ params }: { params: { hash: string }
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                     <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                   </svg>
-                  <span>{String(headerMeta.website)}</span>
+                  <span>{headerMeta.website}</span>
                 </div>
               )}
             </div>

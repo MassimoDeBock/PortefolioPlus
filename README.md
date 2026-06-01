@@ -108,11 +108,12 @@ Content types: `project`, `experience`, `education`, `skill`, `meta` (personal i
 
 1. Push this repo to GitHub
 2. Go to [vercel.com](https://vercel.com) → **Add New Project** → import your repo
-3. In **Settings → Environment Variables**, add every variable from `.env.example`
+3. In **Settings → Environment Variables**, add all variables from `.env.example` **except** `BLOB_READ_WRITE_TOKEN` (see step 6)
    - Set `NEXT_PUBLIC_BASE_URL` to your production URL (e.g. `https://your-project.vercel.app`)
    - Remember to escape `$` as `\$` in `ADMIN_PASSWORD_HASH`
 4. Deploy — Vercel auto-detects Next.js, no build config needed
 5. After first deploy, run `npm run db:push` once against your production Neon DB to initialise the schema
+6. **Image uploads (optional):** Go to Vercel dashboard → **Storage** → **Create Blob Store**, then copy the generated `BLOB_READ_WRITE_TOKEN` into your project's environment variables and redeploy
 
 > **Note:** `@react-pdf/renderer` runs server-side only and is listed under `serverComponentsExternalPackages` in `next.config.mjs`. No Puppeteer or headless browser is needed — works on Vercel's free tier.
 

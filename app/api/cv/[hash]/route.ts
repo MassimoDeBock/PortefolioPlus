@@ -19,9 +19,8 @@ export async function GET(_req: NextRequest, { params }: { params: { hash: strin
   const doc = cv.cvDocument as CvDocument;
   const ids: string[] = [];
   for (const section of doc?.sections ?? []) {
-    if ((section as { content_id?: string }).content_id) {
-      ids.push((section as { content_id: string }).content_id);
-    }
+    const sid = (section as unknown as { content_id?: string }).content_id;
+    if (sid) ids.push(sid);
     for (const item of section.items ?? []) {
       if (item.content_id) ids.push(item.content_id);
     }
