@@ -52,7 +52,14 @@ export default async function CvListPage() {
                       /company/{cv.hash}
                     </a>
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{cv.viewCount}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center gap-1.5 text-xs font-mono ${cv.viewCount ? 'text-gray-700' : 'text-gray-300'}`}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+                      </svg>
+                      {cv.viewCount}
+                    </span>
+                  </td>
                   <td className="px-4 py-3 text-gray-400 text-xs">
                     {new Date(cv.createdAt).toLocaleDateString()}
                   </td>

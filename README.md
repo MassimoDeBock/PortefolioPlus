@@ -174,7 +174,6 @@ npm run db:studio     # open Drizzle Studio (browser GUI for your data)
 |---|---|---|
 | Image upload | Low | `/api/upload` stub exists; wire up Vercel Blob |
 | CV expiry date UI | Low | `expires_at` column in DB; needs a date picker in admin |
-| View count on CV list | Low | `view_count` is tracked; surface it in the admin CV list |
 | Job description PDF upload | Low | Currently text-paste only; add a file input to `/admin/cv/new` |
 | PDF preview before export | Medium | Render react-pdf in an iframe inside the CV editor |
 | LinkedIn / résumé import | Medium | Parse PDF/text to pre-fill the content library |
