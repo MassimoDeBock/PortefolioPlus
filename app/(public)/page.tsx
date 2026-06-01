@@ -171,9 +171,16 @@ export default async function HomePage() {
                           {[c.startDate, c.endDate ?? 'Present'].filter(Boolean).join(' – ')}
                         </p>
                       </div>
-                      <p className="text-sm mb-2" style={{ color: 'var(--text-muted)' }}>
-                        {[m(c, 'company'), m(c, 'location')].filter(Boolean).join(' · ')}
-                      </p>
+                      <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                          {[m(c, 'company'), m(c, 'location')].filter(Boolean).join(' · ')}
+                        </p>
+                        {c.url && (
+                          <a href={c.url} target="_blank" rel="noopener noreferrer" className="cyber-link text-xs font-mono whitespace-nowrap">
+                            website ↗
+                          </a>
+                        )}
+                      </div>
                       {highlights.length > 0 && (
                         <ul className="space-y-1 text-sm">
                           {highlights.map((h, k) => (

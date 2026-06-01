@@ -129,6 +129,13 @@ export function ContentForm({ initialValues, onSubmit, isLoading, submitLabel = 
         </div>
       )}
 
+      {values.type === 'experience' && (
+        <div className={fieldCls}>
+          <label className={labelCls}>Company URL</label>
+          <input type="url" value={values.url} onChange={set('url')} className={inputCls} placeholder="https://company.com" />
+        </div>
+      )}
+
       {/* Type-specific metadata */}
       {values.type === 'project' && (
         <section className="border-t pt-4">

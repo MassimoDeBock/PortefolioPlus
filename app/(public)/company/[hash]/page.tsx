@@ -211,7 +211,14 @@ export default async function CompanyPage({ params }: { params: { hash: string }
                               {[c.startDate, c.endDate ?? 'Present'].join(' – ')}
                             </p>
                           </div>
-                          <p className="text-sm mb-2" style={{ color: 'var(--text-muted)' }}>{meta(c, 'company')}</p>
+                          <div className="flex items-baseline gap-3 mb-2 flex-wrap">
+                            <p className="text-sm" style={{ color: 'var(--text-muted)' }}>{meta(c, 'company')}</p>
+                            {c.url && (
+                              <a href={c.url} target="_blank" rel="noopener noreferrer" className="cyber-link text-xs font-mono whitespace-nowrap">
+                                website ↗
+                              </a>
+                            )}
+                          </div>
                           {(item.highlights ?? []).length > 0 && (
                             <ul className="space-y-1 text-sm">
                               {item.highlights!.map((h, k) => (
