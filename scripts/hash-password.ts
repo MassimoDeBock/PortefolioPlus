@@ -12,6 +12,7 @@ if (!password) {
   process.exit(1);
 }
 
-const hash = await bcrypt.hash(password, 12);
-console.log('\nADMIN_PASSWORD_HASH=' + hash + '\n');
-console.log('Add this to your .env.local file.');
+bcrypt.hash(password, 12).then(hash => {
+  console.log('\nADMIN_PASSWORD_HASH=' + hash + '\n');
+  console.log('Add this to your .env.local file.');
+});

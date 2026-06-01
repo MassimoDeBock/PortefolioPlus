@@ -15,6 +15,7 @@ CRITICAL RULES:
 - Always include ALL education items.
 - For projects and skills, select the most relevant items from the library.
 - Never mention employment type (no "internship", "part-time", "full-time", "freelance", or similar labels) anywhere.
+- Write the summary in first person, as if the candidate wrote it themselves (e.g. "I am an experienced…", "I bring…", "My background includes…"). Never use the candidate's name, third-person pronouns, or placeholder text like {name}.
 - Return only valid JSON — no markdown, no explanation.`;
 
 export async function POST(req: NextRequest) {
