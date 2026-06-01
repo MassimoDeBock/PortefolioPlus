@@ -33,6 +33,14 @@ export async function POST(req: NextRequest) {
   const metaItem = library.find((item) => item.type === 'meta') ?? null;
   const libraryForLLM = library.filter((item) => item.type !== 'meta');
 
+  // Split by type so the AI can't mix up IDs across sections
+  const byType = {
+    experience: libraryForLLM.filter(i => i.type === 'experience'),
+    project:    libraryForLLM.filter(i => i.type === 'project'),
+    skill:      libraryForLLM.filter(i => i.type === 'skill'),
+    education:  libraryForLLM.filter(i => i.type === 'education'),
+  };
+
   // Build a safe candidate profile from meta (no PII — no email/phone/location)
   const metaMeta = (metaItem?.metadata ?? {}) as Record<string, unknown>;
   const candidateProfile = [
@@ -52,10 +60,19 @@ Job posting for ${roleTitle} at ${companyName}:
 ${jobPost}
 ---
 
-Content library (JSON):
-${JSON.stringify(libraryForLLM, null, 2)}
+EXPERIENCE items (use only these IDs in the "experience" section):
+${JSON.stringify(byType.experience, null, 2)}
 
-Return a JSON object with exactly this shape — all six sections must always be present.
+PROJECT items (use only these IDs in the "projects" section):
+${JSON.stringify(byType.project, null, 2)}
+
+SKILL items (use only these IDs in the "skills" section):
+${JSON.stringify(byType.skill, null, 2)}
+
+EDUCATION items (use only these IDs in the "education" section):
+${JSON.stringify(byType.education, null, 2)}
+
+Return a JSON object with exactly this shape — all five sections must always be present.
 IMPORTANT: custom_summary and the summary section content must be written in first person ("I am…", "I have…"). Do NOT use the candidate's name or any third-person phrasing.
 {
   "custom_summary": "3-5 sentence tailored summary for this role, written in first person",
@@ -70,28 +87,28 @@ IMPORTANT: custom_summary and the summary section content must be written in fir
         "type": "experience",
         "visible": true,
         "items": [
-          { "content_id": "<uuid>", "highlights": ["rephrased bullet 1", "rephrased bullet 2"], "order": 1 }
+          { "content_id": "<uuid from EXPERIENCE items only>", "highlights": ["rephrased bullet 1", "rephrased bullet 2"], "order": 1 }
         ]
       },
       {
         "type": "projects",
         "visible": true,
         "items": [
-          { "content_id": "<uuid>", "highlights": ["rephrased bullet 1"], "order": 1 }
+          { "content_id": "<uuid from PROJECT items only>", "highlights": ["rephrased bullet 1"], "order": 1 }
         ]
       },
       {
         "type": "skills",
         "visible": false,
         "items": [
-          { "content_id": "<uuid>", "order": 1 }
+          { "content_id": "<uuid from SKILL items only>", "order": 1 }
         ]
       },
       {
         "type": "education",
         "visible": true,
         "items": [
-          { "content_id": "<uuid>", "order": 1 }
+          { "content_id": "<uuid from EDUCATION items only>", "order": 1 }
         ]
       }
     ]
@@ -99,10 +116,10 @@ IMPORTANT: custom_summary and the summary section content must be written in fir
 }
 
 Rules:
-- Include every experience item and every education item from the library.
+- Include every EXPERIENCE item and every EDUCATION item — never omit any.
 - For projects, include the most relevant ones to this job posting.
 - For skills, order by relevance to this job posting.
-- Only use content_ids that exist in the provided library.`;
+- Never use an ID from one category in a different section (e.g. never put a project ID in the experience section).`;
 
   const completion = await createChatCompletion({
     response_format: { type: 'json_object' },
@@ -119,6 +136,23 @@ Rules:
     parsed = JSON.parse(raw);
   } catch {
     return NextResponse.json({ error: 'AI returned invalid JSON', raw }, { status: 502 });
+  }
+
+  // Guard: remove any items where the AI used the wrong content_id type for a section
+  const idsByType: Record<string, Set<string>> = {
+    experience: new Set(byType.experience.map(i => i.id)),
+    projects:   new Set(byType.project.map(i => i.id)),
+    skills:     new Set(byType.skill.map(i => i.id)),
+    education:  new Set(byType.education.map(i => i.id)),
+  };
+  type SectionItem = { content_id: string; [k: string]: unknown };
+  type Section = { type: string; items?: SectionItem[]; [k: string]: unknown };
+  if (parsed.cv_document?.sections) {
+    parsed.cv_document.sections = (parsed.cv_document.sections as Section[]).map(section => {
+      const allowed = idsByType[section.type];
+      if (!allowed || !section.items) return section;
+      return { ...section, items: section.items.filter(it => allowed.has(it.content_id)) };
+    });
   }
 
   // Prepend the header section using local meta — never sent to the LLM
