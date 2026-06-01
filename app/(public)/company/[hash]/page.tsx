@@ -248,15 +248,18 @@ export default async function CompanyPage({ params }: { params: { hash: string }
                         <div key={j} className="item-block">
                           <div className="flex items-baseline justify-between gap-4">
                             <p className="font-semibold" style={{ color: 'var(--text-primary)' }}>{c.title}</p>
-                            {c.url && (
-                              <a
-                                href={c.url}
-                                target="_blank"
-                                className="cyber-link text-xs font-mono whitespace-nowrap"
-                              >
-                                live ↗
-                              </a>
-                            )}
+                            <div className="flex gap-3 shrink-0">
+                              {c.url && (
+                                <a href={c.url} target="_blank" rel="noopener noreferrer" className="cyber-link text-xs font-mono whitespace-nowrap">
+                                  live ↗
+                                </a>
+                              )}
+                              {c.repoUrl && (
+                                <a href={c.repoUrl} target="_blank" rel="noopener noreferrer" className="cyber-link text-xs font-mono whitespace-nowrap">
+                                  source ↗
+                                </a>
+                              )}
+                            </div>
                           </div>
                           {tech.length > 0 && <TechTags tech={tech} />}
                           {(item.highlights ?? []).length > 0 && (

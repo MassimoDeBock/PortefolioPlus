@@ -4,7 +4,7 @@ import { eq, desc } from 'drizzle-orm';
 import type { ContentItem } from '@/lib/db/schema';
 import { ColorWheel } from '@/components/public/ColorWheel';
 import { ExpandableDescription } from '@/components/public/ExpandableDescription';
-import { FilmStrip } from '@/components/public/FilmStrip';
+import { ProjectsSection } from '@/components/public/ProjectsSection';
 
 export const revalidate = 3600;
 
@@ -46,6 +46,16 @@ export default async function HomePage() {
     github: rawMeta.github as string | undefined,
     website: rawMeta.website as string | undefined,
   };
+
+  // Collect all unique keywords from every project's tech + tags
+  const projectKeywords = Array.from(
+    new Set(
+      projects.flatMap(p => [
+        ...((p.tech as string[] | null) ?? []),
+        ...((p.tags as string[] | null) ?? []),
+      ]).map(k => k.toLowerCase())
+    )
+  ).sort();
 
   const skillsByCategory = skills.reduce<Record<string, ContentItem[]>>((acc, skill) => {
     const cat = (((skill.metadata as Record<string, unknown> | null)?.category) as string) || 'other';
@@ -135,13 +145,13 @@ export default async function HomePage() {
 
       <div className="mx-4 sm:mx-8 lg:mx-auto lg:max-w-3xl py-10 space-y-10">
 
-        {/* Projects film strip */}
+        {/* Projects */}
         {projects.length > 0 && (
           <div>
             <p className="font-mono text-xs tracking-widest uppercase mb-4" style={{ color: 'var(--accent)' }}>
               <span style={{ opacity: 0.5 }}>//</span> projects
             </p>
-            <FilmStrip projects={projects} />
+            <ProjectsSection projects={projects} keywords={projectKeywords} />
           </div>
         )}
 
