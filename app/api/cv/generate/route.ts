@@ -11,6 +11,7 @@ CRITICAL RULES:
 - Only reference content items from the provided library using their exact IDs.
 - Do not invent, embellish, or add any experience, skills, or achievements not present in the library. Every claim in the summary and bullets must be directly traceable to the provided content items.
 - You may rephrase bullet highlights to match the job's language, but must stay strictly factually accurate to the source — no extrapolation.
+- Each item's highlights must be derived exclusively from that item's own content in the library. Never mix highlights from one item into another item's entry.
 - Always include ALL experience items — never omit any.
 - Always include ALL education items.
 - For projects and skills, select the most relevant items from the library.

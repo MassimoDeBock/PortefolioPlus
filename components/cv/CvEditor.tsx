@@ -75,8 +75,9 @@ export function CvEditor({ hash, initialCvDocument, initialSummary, library, bas
   }
 
   function updateHighlights(sectionIdx: number, itemIdx: number, raw: string) {
-    const highlights = raw.split('\n').map(s => s.trim()).filter(Boolean);
-    updateItem(sectionIdx, itemIdx, { highlights });
+    // Store raw splits while typing — trailing spaces and empty lines are preserved
+    // so the cursor doesn't jump. Trimming happens on save.
+    updateItem(sectionIdx, itemIdx, { highlights: raw.split('\n') });
   }
 
   // Sync summary section content with the summary field
@@ -95,10 +96,20 @@ export function CvEditor({ hash, initialCvDocument, initialSummary, library, bas
     setSaved(false);
     setError('');
     try {
+      const cleanedDoc: CvDocument = {
+        ...doc,
+        sections: doc.sections.map(s => ({
+          ...s,
+          items: s.items?.map(it => ({
+            ...it,
+            highlights: it.highlights?.map(h => h.trim()).filter(Boolean),
+          })),
+        })),
+      };
       const res = await fetch(`/api/cv/${hash}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ cvDocument: doc, customSummary: summary }),
+        body: JSON.stringify({ cvDocument: cleanedDoc, customSummary: summary }),
       });
       if (!res.ok) throw new Error(await res.text());
       setSaved(true);
