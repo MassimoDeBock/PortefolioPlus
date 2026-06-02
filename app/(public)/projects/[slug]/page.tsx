@@ -148,14 +148,21 @@ export default async function ProjectPage({ params }: { params: { slug: string }
           </div>
         )}
 
-        {/* Description */}
-        {(project.description || project.summary) && (
+        {/* Summary + Description */}
+        {(project.summary || project.description) && (
           <div className="cyber-card cyber-card--dim">
             <section className="cyber-card-inner p-6">
               <SectionHeader label="about" />
-              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-body)', whiteSpace: 'pre-wrap' }}>
-                {project.description ?? project.summary}
-              </p>
+              {project.summary && (
+                <p className="text-sm leading-relaxed font-medium mb-4" style={{ color: 'var(--text-primary)' }}>
+                  {project.summary}
+                </p>
+              )}
+              {project.description && (
+                <p className="text-sm leading-relaxed" style={{ color: 'var(--text-body)', whiteSpace: 'pre-wrap' }}>
+                  {project.description}
+                </p>
+              )}
             </section>
           </div>
         )}
