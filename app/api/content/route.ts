@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { contentItems } from '@/lib/db/schema';
 import { auth } from '@/lib/auth';
@@ -40,5 +41,7 @@ export async function POST(req: NextRequest) {
     })
     .returning();
 
+  revalidatePath('/');
+  revalidatePath('/projects/[slug]', 'page');
   return NextResponse.json(item, { status: 201 });
 }

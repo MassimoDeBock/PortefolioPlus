@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { contentItems } from '@/lib/db/schema';
 import { auth } from '@/lib/auth';
@@ -38,6 +39,8 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     .returning();
 
   if (!item) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  revalidatePath('/');
+  revalidatePath('/projects/[slug]', 'page');
   return NextResponse.json(item);
 }
 
@@ -46,5 +49,7 @@ export async function DELETE(_req: NextRequest, { params }: { params: { id: stri
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
   await db.delete(contentItems).where(eq(contentItems.id, params.id));
+  revalidatePath('/');
+  revalidatePath('/projects/[slug]', 'page');
   return new NextResponse(null, { status: 204 });
 }
