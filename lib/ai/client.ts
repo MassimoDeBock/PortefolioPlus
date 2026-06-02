@@ -15,12 +15,13 @@ const MODEL_FALLBACK_CHAIN = [
 
 export async function createChatCompletion(
   params: Omit<OpenAI.Chat.ChatCompletionCreateParamsNonStreaming, 'model'>
-): Promise<OpenAI.Chat.ChatCompletion> {
+): Promise<{ completion: OpenAI.Chat.ChatCompletion; model: string }> {
   const client = getDeepSeekClient();
   let lastErr: unknown;
   for (const model of MODEL_FALLBACK_CHAIN) {
     try {
-      return await client.chat.completions.create({ ...params, model });
+      const completion = await client.chat.completions.create({ ...params, model });
+      return { completion, model };
     } catch (err: unknown) {
       const status = (err as { status?: number })?.status;
       if (status === 404 || status === 429) {

@@ -53,6 +53,16 @@ export async function POST(req: NextRequest) {
     metaMeta.linkedin ? `LinkedIn: ${metaMeta.linkedin}` : null,
   ].filter(Boolean).join('\n');
 
+  // Compact overview for relevance matching (just id + title + summary + tech/tags)
+  const overview = libraryForLLM.map(i => ({
+    id: i.id,
+    type: i.type,
+    title: i.title,
+    summary: i.summary,
+    tech: i.tech,
+    tags: i.tags,
+  }));
+
   const prompt = `Candidate profile:
 ${candidateProfile || '(no profile provided)'}
 
@@ -61,16 +71,19 @@ Job posting for ${roleTitle} at ${companyName}:
 ${jobPost}
 ---
 
-EXPERIENCE items (use only these IDs in the "experience" section):
+CONTENT OVERVIEW (all items — use this to judge relevance before picking projects/skills):
+${JSON.stringify(overview, null, 2)}
+
+EXPERIENCE items — full detail (use only these IDs in the "experience" section):
 ${JSON.stringify(byType.experience, null, 2)}
 
-PROJECT items (use only these IDs in the "projects" section):
+PROJECT items — full detail (use only these IDs in the "projects" section):
 ${JSON.stringify(byType.project, null, 2)}
 
-SKILL items (use only these IDs in the "skills" section):
+SKILL items — full detail (use only these IDs in the "skills" section):
 ${JSON.stringify(byType.skill, null, 2)}
 
-EDUCATION items (use only these IDs in the "education" section):
+EDUCATION items — full detail (use only these IDs in the "education" section):
 ${JSON.stringify(byType.education, null, 2)}
 
 Return a JSON object with exactly this shape — all five sections must always be present.
@@ -118,11 +131,11 @@ IMPORTANT: custom_summary and the summary section content must be written in fir
 
 Rules:
 - Include every EXPERIENCE item and every EDUCATION item — never omit any.
-- For projects, include the most relevant ones to this job posting.
+- For projects, carefully read the job posting and select only the 2–4 most relevant ones based on tech stack, domain, and skills required. Fewer highly relevant projects beats a long list of loosely related ones.
 - For skills, order by relevance to this job posting.
 - Never use an ID from one category in a different section (e.g. never put a project ID in the experience section).`;
 
-  const completion = await createChatCompletion({
+  const { completion, model: usedModel } = await createChatCompletion({
     response_format: { type: 'json_object' },
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },
@@ -174,7 +187,7 @@ Rules:
       jobPostRaw: jobPost,
       customSummary: parsed.custom_summary ?? '',
       cvDocument: parsed.cv_document ?? {},
-      webpageConfig: {},
+      webpageConfig: { generationModel: usedModel },
     })
     .returning();
 

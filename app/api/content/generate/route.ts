@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unknown type' }, { status: 400 });
   }
 
-  const completion = await createChatCompletion({
+  const { completion } = await createChatCompletion({
     response_format: { type: 'json_object' },
     messages: [
       { role: 'system', content: SYSTEM_PROMPT },

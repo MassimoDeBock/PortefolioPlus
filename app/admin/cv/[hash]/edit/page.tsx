@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { unstable_noStore as noStore } from 'next/cache';
 import { db } from '@/lib/db';
 import { cvs, contentItems } from '@/lib/db/schema';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, and } from 'drizzle-orm';
 import { notFound } from 'next/navigation';
 import { CvEditor } from '@/components/cv/CvEditor';
 
@@ -30,11 +30,14 @@ export default async function EditCvPage({ params }: { params: { hash: string } 
     }
   }
 
-  const library =
+  const [library, allProjects] = await Promise.all([
     ids.length > 0
-      ? await db.select().from(contentItems).where(inArray(contentItems.id, ids))
-      : [];
+      ? db.select().from(contentItems).where(inArray(contentItems.id, ids))
+      : Promise.resolve([]),
+    db.select().from(contentItems).where(eq(contentItems.type, 'project')),
+  ]);
 
+  const webpageConfig = (cv.webpageConfig ?? {}) as Record<string, unknown>;
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000';
 
   return (
@@ -48,6 +51,8 @@ export default async function EditCvPage({ params }: { params: { hash: string } 
         initialCvDocument={cv.cvDocument as Parameters<typeof CvEditor>[0]['initialCvDocument']}
         initialSummary={cv.customSummary ?? ''}
         library={library}
+        allProjects={allProjects}
+        generationModel={webpageConfig.generationModel as string | undefined}
         baseUrl={baseUrl}
       />
     </div>

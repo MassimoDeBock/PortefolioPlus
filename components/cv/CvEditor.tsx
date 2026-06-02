@@ -31,6 +31,8 @@ interface Props {
   initialCvDocument: CvDocument;
   initialSummary: string;
   library: ContentItem[];
+  allProjects: ContentItem[];
+  generationModel?: string;
   baseUrl: string;
 }
 
@@ -47,8 +49,10 @@ function metaField(item: ContentItem, key: string): string {
 
 // ─── Editor ──────────────────────────────────────────────────────────────────
 
-export function CvEditor({ hash, initialCvDocument, initialSummary, library, baseUrl }: Props) {
+export function CvEditor({ hash, initialCvDocument, initialSummary, library, allProjects, generationModel, baseUrl }: Props) {
   const [doc, setDoc] = useState<CvDocument>(initialCvDocument);
+  // Merged library: referenced items + any projects added manually
+  const [extLibrary, setExtLibrary] = useState<ContentItem[]>(library);
   const [summary, setSummary] = useState(initialSummary);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -134,11 +138,14 @@ export function CvEditor({ hash, initialCvDocument, initialSummary, library, bas
     <div className="space-y-6">
       {/* Toolbar */}
       <div className="flex items-center justify-between rounded border bg-white px-4 py-3 shadow-sm">
-        <div>
+        <div className="space-y-0.5">
           <p className="text-xs text-gray-500">Public URL</p>
           <a href={publicUrl} target="_blank" className="text-sm text-blue-600 hover:underline">
             {publicUrl}
           </a>
+          {generationModel && (
+            <p className="text-xs text-gray-400 font-mono">model: {generationModel}</p>
+          )}
         </div>
         <div className="flex items-center gap-3">
           {saved && <span className="text-sm text-green-600">Saved!</span>}
@@ -179,7 +186,7 @@ export function CvEditor({ hash, initialCvDocument, initialSummary, library, bas
           <div className="p-4">
             {/* Header — read-only, populated from profile */}
             {section.type === 'header' && (() => {
-              const meta = section.content_id ? contentById(library, section.content_id) : null;
+              const meta = section.content_id ? contentById(extLibrary, section.content_id) : null;
               const m = (meta?.metadata ?? {}) as Record<string, unknown>;
               return (
                 <div className="text-sm text-gray-500 space-y-0.5">
@@ -203,11 +210,11 @@ export function CvEditor({ hash, initialCvDocument, initialSummary, library, bas
             )}
 
             {/* Experience / Projects / Education */}
-            {(section.type === 'experience' || section.type === 'projects' || section.type === 'education') &&
-              (section.items ?? [])
+            {(section.type === 'experience' || section.type === 'projects' || section.type === 'education') && <>
+              {(section.items ?? [])
                 .sort((a, b) => a.order - b.order)
                 .map((item, iIdx) => {
-                  const content = contentById(library, item.content_id);
+                  const content = contentById(extLibrary, item.content_id);
                   if (!content) return (
                     <div key={iIdx} className="mb-3 text-sm text-red-400">
                       Missing content item: {item.content_id}
@@ -253,13 +260,44 @@ export function CvEditor({ hash, initialCvDocument, initialSummary, library, bas
                   );
                 })}
 
+              {/* Add project button — only on the projects section */}
+              {section.type === 'projects' && (() => {
+                const usedIds = new Set((section.items ?? []).map(i => i.content_id));
+                const available = allProjects.filter(p => !usedIds.has(p.id));
+                if (!available.length) return null;
+                return (
+                  <div className="mt-2">
+                    <select
+                      className="w-full rounded border px-3 py-2 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-black"
+                      value=""
+                      onChange={e => {
+                        const project = allProjects.find(p => p.id === e.target.value);
+                        if (!project) return;
+                        // Add to extended library if not already there
+                        setExtLibrary(lib => lib.find(l => l.id === project.id) ? lib : [...lib, project]);
+                        const nextOrder = Math.max(0, ...(section.items ?? []).map(i => i.order)) + 1;
+                        updateSection(sIdx, {
+                          items: [...(section.items ?? []), { content_id: project.id, highlights: [], order: nextOrder, visible: true }],
+                        });
+                      }}
+                    >
+                      <option value="">＋ add project…</option>
+                      {available.map(p => (
+                        <option key={p.id} value={p.id}>{p.title}</option>
+                      ))}
+                    </select>
+                  </div>
+                );
+              })()}
+            </>}
+
             {/* Skills */}
             {section.type === 'skills' && (
               <div className="flex flex-wrap gap-2">
                 {(section.items ?? [])
                   .sort((a, b) => a.order - b.order)
                   .map((item, iIdx) => {
-                    const content = contentById(library, item.content_id);
+                    const content = contentById(extLibrary, item.content_id);
                     if (!content) return null;
                     return (
                       <label key={iIdx} className="flex items-center gap-1.5 rounded border px-2 py-1 text-xs cursor-pointer">
