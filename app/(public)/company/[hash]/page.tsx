@@ -79,6 +79,20 @@ export default async function CompanyPage({ params }: { params: { hash: string }
     <main className="min-h-screen" style={{ color: 'var(--text-primary)' }}>
       <ColorWheel />
 
+      {/* Back to portfolio */}
+      <div className="mx-4 pt-5 sm:mx-8 lg:mx-auto lg:max-w-3xl">
+        <a
+          href="/"
+          className="font-mono text-xs inline-flex items-center gap-1.5"
+          style={{ color: 'var(--text-muted)', textDecoration: 'none' }}
+        >
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          full portfolio
+        </a>
+      </div>
+
       {/* Hero Header */}
       <div className="cyber-card cyber-card--hero mx-4 mt-8 sm:mx-8 lg:mx-auto lg:max-w-3xl">
         <section className="cyber-card-inner px-8 pt-10 pb-8">
