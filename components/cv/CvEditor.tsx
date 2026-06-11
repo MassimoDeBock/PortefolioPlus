@@ -235,15 +235,28 @@ export function CvEditor({ hash, initialCvDocument, initialSummary, library, all
                           <p className="font-medium text-sm">{content.title}</p>
                           <p className="text-xs text-gray-500">{subtitle}</p>
                         </div>
-                        <label className="flex items-center gap-1.5 text-xs text-gray-400 cursor-pointer whitespace-nowrap">
-                          <input
-                            type="checkbox"
-                            checked={item.visible !== false}
-                            onChange={e => updateItem(sIdx, iIdx, { visible: e.target.checked })}
-                            className="rounded"
-                          />
-                          Include
-                        </label>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <label className="flex items-center gap-1.5 text-xs text-gray-400 cursor-pointer whitespace-nowrap">
+                            <input
+                              type="checkbox"
+                              checked={item.visible !== false}
+                              onChange={e => updateItem(sIdx, iIdx, { visible: e.target.checked })}
+                              className="rounded"
+                            />
+                            Include
+                          </label>
+                          {section.type === 'projects' && (
+                            <button
+                              onClick={() => updateSection(sIdx, {
+                                items: (section.items ?? []).filter((_, idx) => idx !== iIdx),
+                              })}
+                              className="text-xs text-red-400 hover:text-red-600"
+                              title="Remove from CV"
+                            >
+                              remove
+                            </button>
+                          )}
+                        </div>
                       </div>
                       {section.type !== 'education' && (
                         <div>
