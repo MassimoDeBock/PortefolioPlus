@@ -33,7 +33,7 @@ const s = StyleSheet.create({
     fontSize: 24,
     textAlign: 'center',
     letterSpacing: 0.3,
-    marginBottom: 3,
+    marginBottom: 12,
   },
   roleTitle: {
     fontSize: 11,
